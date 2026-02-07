@@ -9,7 +9,8 @@ app.secret_key = 'super-secret-key-change-this-2025'
 
 # ────────────────────────────────────────────────
 # ────────────────────────────────────────────────
-BASE_DIR    = r"C:\Users\Santhosh kumar D\OneDrive\Desktop\kt"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 EXCEL_FILE  = os.path.join(BASE_DIR, "questions.xlsx")
 RESULT_FILE = os.path.join(BASE_DIR, "result.xlsx")
 # ────────────────────────────────────────────────
