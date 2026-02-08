@@ -8,11 +8,11 @@ app = Flask(__name__)
 app.secret_key = 'super-secret-key-change-this-2025'
 
 # ────────────────────────────────────────────────
-BASE_DIR    = r"C:\Users\Santhosh kumar D\OneDrive\Desktop\kt"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EXCEL_FILE  = os.path.join(BASE_DIR, "questions.xlsx")
 RESULT_FILE = os.path.join(BASE_DIR, "result.xlsx")
 
-ALLOWED_EMPLOYEES = ["Santhosh", "Janani", "Aishwrya"]
+ALLOWED_EMPLOYEES = ["Santhosh", "Janani G", "Aishwrya","Satish","Zaiba","Guru Divya","Aarthi","Vashanth","Abinaya","Suchithra","Dhana priya","Dhanya","Nivetha","Shreyas","Siri","Ananaya","Ashwini","Gopika","Sridharshini","Kavi Keerthna","Ramya","Priya","Keerthana","Nagraj","Vimal"]
 
 # ────────────────────────────────────────────────
 def load_questions():
@@ -254,7 +254,7 @@ RESULT_HTML = """
 def login():
     kicked_msg = ""
     if request.args.get('terminated') == 'yes':
-        kicked_msg = "Previous session was terminated due to tab switch or timeout.<br>Please start again."
+        kicked_msg = "Previous session was terminated due to tab switch or timeout.<br>Contact Santhosh."
 
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
