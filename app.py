@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EXCEL_FILE  = os.path.join(BASE_DIR, "questions.xlsx")
 RESULT_FILE = os.path.join(BASE_DIR, "result.xlsx")
 
-ALLOWED_EMPLOYEES = ["Santhosh", "Janani G", "Aishwrya","Satish","Zaiba","Guru Divya","Aarthi","Vashanth","Abinaya","Suchithra","Dhana priya","Dhanya","Nivetha","Shreyas","Siri","Ananaya","Ashwini","Gopika","Sridharshini","Kavi Keerthna","Ramya","Priya","Keerthana","Nagraj","Vimal"]
+ALLOWED_EMPLOYEES = ["Santhosh", "we","Janani G", "Aishwrya","Satish","Zaiba","Guru Divya","Aarthi","Vashanth","Abinaya","Suchithra","Dhana priya","Dhanya","Nivetha","Shreyas","Siri","Ananaya","Ashwini","Gopika","Sridharshini","Kavi Keerthna","Ramya","Priya","Keerthana","Nagraj","Vimal"]
 
 # ────────────────────────────────────────────────
 def load_questions():
