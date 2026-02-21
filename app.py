@@ -9,15 +9,17 @@ app.secret_key = 'super-secret-key-change-this-2025'
 
 # ────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-EXCEL_FILE  = os.path.join(BASE_DIR, "questions.xlsx")
+EXCEL_FILE = os.path.join(BASE_DIR, "questions.xlsx")
 RESULT_FILE = os.path.join(BASE_DIR, "result.xlsx")
 
 ALLOWED_EMPLOYEES = [
-    "Santhosh","Rajkumar Sir ","Ram Sir ", "janani G Hegde2", "Amrutha N M", "AishwaryA G N", "Satish", "Zaiba Khanum",
-    "GuruDivya L", "Aarthi R", "Vashanth Kumar", "Abinaya 1", "Suchithra PS", "Dhanapriya R",
-    "Dhanya Shree U", "Nivetha S", "Shreyas CM", "Siri H G", "Ananaya GC", "Ashwini Sindhe", "Gopika ",
-    "Bhagya Shree U", "Sri Dharshini", "Kavikeerthana Palmani", "Ramya shree", "PriyaDharshini",
-    "Keerthana L", "NAGARAJAN R","Kiruthika Saravanan", "Vimalkarthik"
+    "Santhosh", "Rajkumar Sir ", "Ram Sir ", "janani G Hegde2", "Amrutha N M",
+    "AishwaryA G N", "Satish", "Zaiba Khanum", "GuruDivya L", "Aarthi R",
+    "Vashanth Kumar", "Abinaya 1", "Suchithra PS", "Dhanapriya R",
+    "Dhanya Shree U", "Nivetha S", "Shreyas CM", "Siri H G", "Ananaya GC",
+    "Ashwini Sindhe", "Gopika ", "Bhagya Shree U", "Sri Dharshini",
+    "Kavikeerthana Palmani", "Ramya shree", "PriyaDharshini", "Keerthana L",
+    "NAGARAJAN R", "Kiruthika Saravanan", "Vimalkarthik"
 ]
 
 # ────────────────────────────────────────────────
@@ -31,7 +33,7 @@ def load_questions():
     df = pd.read_excel(EXCEL_FILE, header=None)
     if df.shape[1] < 6:
         raise ValueError("Excel must have 6 columns: question + 4 options + answer letter")
-    
+   
     questions = []
     for _, row in df.iterrows():
         try:
@@ -48,15 +50,15 @@ def load_questions():
             })
         except:
             continue
-    
+   
     if not questions:
         raise ValueError("No valid questions found in Excel. Check format/content.")
-    
+   
     print(f"Loaded {len(questions)} questions successfully.")
     return questions
 
 # ────────────────────────────────────────────────
-#               HTML TEMPLATES
+# HTML TEMPLATES
 # ────────────────────────────────────────────────
 
 LOGIN_HTML = """
@@ -81,13 +83,12 @@ LOGIN_HTML = """
 <div class="card">
     <h1>iMatiz Technology Quiz</h1>
     {% if kicked_msg %}<div class="msg">{{ kicked_msg | safe }}</div>{% endif %}
-    
+   
     <div id="blocked-msg" class="blocked">
         This test was terminated earlier (tab switch / timeout).<br>
         You are no longer allowed to restart in this browser.<br>
         Contact Rajkumar if needed.
     </div>
-
     <form method="post" id="login-form">
         <select name="name" id="name-select" required autofocus>
             <option value="" disabled selected>Select your name</option>
@@ -98,12 +99,10 @@ LOGIN_HTML = """
         <button type="submit" id="start-btn">Start Test</button>
     </form>
 </div>
-
 <script>
     const nameSelect = document.getElementById('name-select');
     const blockedMsg = document.getElementById('blocked-msg');
     const form = document.getElementById('login-form');
-
     function checkLock(name) {
         if (!name) return;
         const isLocked = localStorage.getItem('quiz_locked_' + name) === '1';
@@ -115,7 +114,6 @@ LOGIN_HTML = """
             form.style.display = 'block';
         }
     }
-
     nameSelect.addEventListener('change', () => checkLock(nameSelect.value));
     if (nameSelect.value) checkLock(nameSelect.value);
 </script>
@@ -152,7 +150,7 @@ QUESTION_HTML = """
     <div class="timer" id="timer">30 seconds</div>
     <h2>Question {{ qnum }} of {{ total }}</h2>
     <div class="question">{{ question }}</div>
-    
+   
     <form method="post" id="form">
         {% for opt in options %}
         <label>
@@ -160,14 +158,13 @@ QUESTION_HTML = """
             {{ opt }}
         </label>
         {% endfor %}
-        
+       
         <div class="buttons">
             <button type="submit" name="action" value="next" class="next">Next →</button>
             <button type="button" onclick="window.location.href='/test?skip=1'" class="skip">Skip</button>
         </div>
     </form>
 </div>
-
 <script>
 let time = 30;
 let timer = setInterval(() => {
@@ -178,13 +175,10 @@ let timer = setInterval(() => {
         document.getElementById("form").submit();
     }
 }, 1000);
-
 let tabSwitchDetected = false;
-
 function markTerminated() {
     localStorage.setItem('quiz_locked_' + '{{ name|e }}', '1');
 }
-
 document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden" && !tabSwitchDetected) {
         tabSwitchDetected = true;
@@ -193,7 +187,6 @@ document.addEventListener("visibilitychange", () => {
         window.location.href = "/tab_cheat_end";
     }
 });
-
 window.addEventListener("blur", () => {
     if (!tabSwitchDetected) {
         tabSwitchDetected = true;
@@ -203,6 +196,32 @@ window.addEventListener("blur", () => {
     }
 });
 </script>
+</body>
+</html>
+"""
+
+FINISHED_HTML = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Completed - iMatiz</title>
+    <style>
+        body {font-family:Arial,sans-serif;background:#f8f9fa;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;}
+        .card {background:white;padding:60px 40px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.2);text-align:center;max-width:520px;}
+        h1 {color:#28a745;font-size:2.8rem;margin-bottom:20px;}
+        p {font-size:1.4rem;color:#555;line-height:1.6;margin:30px 0;}
+        .btn {display:inline-block;padding:18px 50px;background:#007bff;color:white;font-size:1.4rem;text-decoration:none;border-radius:10px;transition:0.2s;}
+        .btn:hover {background:#0062cc; transform: translateY(-2px);}
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Quiz Completed!</h1>
+    <p>Thank you, <strong>{{ name }}</strong>!<br>You have successfully finished the iMatiz Technology Quiz.</p>
+    <a href="/result" class="btn">View My Results →</a>
+</div>
 </body>
 </html>
 """
@@ -233,7 +252,6 @@ RESULT_HTML = """
 <div class="container">
     <h1>Your Quiz Results</h1>
     <div class="greeting">Hello <strong>{{ employee_name }}</strong></div>
-
     {% if results|length == 0 %}
         <p style="text-align:center;color:#666;">No previous quiz attempts found.</p>
     {% else %}
@@ -260,7 +278,6 @@ RESULT_HTML = """
         {% endfor %}
     </table>
     {% endif %}
-
     <center>
         <a href="/" class="back">Back to Login</a>
     </center>
@@ -270,7 +287,7 @@ RESULT_HTML = """
 """
 
 # ────────────────────────────────────────────────
-#                   ROUTES
+# ROUTES
 # ────────────────────────────────────────────────
 
 @app.route('/', methods=['GET', 'POST'])
@@ -278,15 +295,12 @@ def login():
     kicked_msg = ""
     if request.args.get('terminated') == 'yes':
         kicked_msg = "Previous session was terminated due to tab switch or timeout.<br>Contact Rajkumar ."
-
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         if name not in ALLOWED_EMPLOYEES:
             return "<h2 style='color:red;text-align:center'>Invalid employee name</h2>", 403
-
         if 'name' in session and session['name'] == name:
             return redirect('/test')
-
         try:
             questions = load_questions()
         except Exception as e:
@@ -295,18 +309,15 @@ def login():
             <pre style="background:#f8d7da;padding:15px;border-radius:6px;max-width:800px;margin:20px auto;">{str(e)}</pre>
             <p style="text-align:center"><a href="/">Try again</a></p>
             """, 500
-
         random.shuffle(questions)
-        session['name']     = name
+        session['name'] = name
         session['questions'] = questions
-        session['current']   = 0
-        session['answers']   = {}           # None = skipped / timeout, str = answered
+        session['current'] = 0
+        session['answers'] = {}  # None = skipped / timeout, str = answered
         return redirect('/test')
-
     return render_template_string(LOGIN_HTML,
                                  employees=ALLOWED_EMPLOYEES,
                                  kicked_msg=kicked_msg)
-
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
@@ -314,7 +325,7 @@ def test():
         return redirect('/')
 
     if session['current'] >= len(session['questions']):
-        return redirect('/result')
+        return redirect('/finished')   # ← Changed: go to thank-you screen instead of result
 
     # Handle skip via GET ?skip=1
     if request.method == 'GET' and request.args.get('skip') == '1':
@@ -324,11 +335,9 @@ def test():
 
     if request.method == 'POST':
         action = request.form.get('action', 'next')
-
         if action == 'next':
             ans = request.form.get('ans')
             session['answers'][str(session['current'])] = ans if ans else None
-
         session['current'] += 1
         return redirect('/test')
 
@@ -340,23 +349,26 @@ def test():
                                  options=q['options'],
                                  name=session.get('name', ''))
 
+@app.route('/finished')
+def finished():
+    if 'questions' not in session:
+        return redirect('/')
+    return render_template_string(FINISHED_HTML,
+                                 name=session.get('name', 'Participant'))
 
 @app.route('/result')
 def result():
     if 'questions' not in session:
         return redirect('/')
 
-    # ────────────────────────────────────────────────
-    # IMPORTANT: Get & calculate everything BEFORE clearing session
-    # ────────────────────────────────────────────────
+    # Calculate & save BEFORE clearing session
     name = session.get('name', 'Unknown')
     questions = session.get('questions', [])
-    answers   = session.get('answers', {})
-    total     = len(questions)
-
-    correct   = 0
-    answered  = 0
-    skipped   = 0
+    answers = session.get('answers', {})
+    total = len(questions)
+    correct = 0
+    answered = 0
+    skipped = 0
 
     for i in range(total):
         user_ans = answers.get(str(i))
@@ -385,7 +397,7 @@ def result():
         df = pd.DataFrame([row])
     df.to_excel(RESULT_FILE, index=False)
 
-    # Load & filter user's own results (still using name from session)
+    # Load user's previous results
     if os.path.exists(RESULT_FILE):
         df = pd.read_excel(RESULT_FILE)
         df['Employee Name'] = df['Employee Name'].astype(str).str.strip()
@@ -396,13 +408,12 @@ def result():
     else:
         results = []
 
-    # Now it's safe to clear the session
+    # Safe to clear now
     session.clear()
 
     return render_template_string(RESULT_HTML,
                                  results=results,
                                  employee_name=name)
-
 
 @app.route('/tab_cheat_end')
 def tab_cheat_end():
@@ -411,12 +422,11 @@ def tab_cheat_end():
 
     name = session.get('name', 'Unknown')
     questions = session.get('questions', [])
-    answers   = session.get('answers', {})
-    total     = len(questions)
-
-    correct   = 0
-    answered  = 0
-    skipped   = 0
+    answers = session.get('answers', {})
+    total = len(questions)
+    correct = 0
+    answered = 0
+    skipped = 0
 
     for i in range(total):
         user_ans = answers.get(str(i))
@@ -447,15 +457,13 @@ def tab_cheat_end():
     session.clear()
     return redirect('/?terminated=yes')
 
-
 if __name__ == '__main__':
     print("\n" + "═"*70)
-    print("   iMatiz Technology - Employee Quiz")
-    print("   Allowed users:", ", ".join(ALLOWED_EMPLOYEES))
-    print("   Note: Terminated users cannot restart in same browser")
-    print("   Results are private per employee")
-    print("   Score should now show correctly after finishing quiz")
-    print("\nOpen →  http://127.0.0.1:5000")
+    print(" iMatiz Technology - Employee Quiz")
+    print(" Allowed users:", ", ".join(ALLOWED_EMPLOYEES))
+    print(" Now shows 'Quiz Completed' screen before showing results")
+    print(" Results are private per employee")
+    print("\nOpen → http://127.0.0.1:5000")
     print("Network → http://<your-ip>:5000")
     print()
     app.run(host='0.0.0.0', port=5000, debug=True)
