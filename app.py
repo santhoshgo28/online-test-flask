@@ -12,7 +12,13 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EXCEL_FILE  = os.path.join(BASE_DIR, "questions.xlsx")
 RESULT_FILE = os.path.join(BASE_DIR, "result.xlsx")
 
-ALLOWED_EMPLOYEES = ["Santhosh", "we","Janani G", "Aishwrya","Satish","Zaiba","Guru Divya","Aarthi","Vashanth","Abinaya","Suchithra","Dhana priya","Dhanya","Nivetha","Shreyas","Siri","Ananaya","Ashwini","Gopika","Sridharshini","Kavi Keerthna","Ramya","Priya","Keerthana","Nagraj","Vimal"]
+ALLOWED_EMPLOYEES = [
+    "Santhosh","Rajkumar Sir ","Ram Sir ", "janani G Hegde2", "Amrutha N M", "AishwaryA G N", "Satish", "Zaiba Khanum",
+    "GuruDivya L", "Aarthi R", "Vashanth Kumar", "Abinaya 1", "Suchithra PS", "Dhanapriya R",
+    "Dhanya Shree U", "Nivetha S", "Shreyas CM", "Siri H G", "Ananaya GC", "Ashwini Sindhe", "Gopika ",
+    "Bhagya Shree U", "Sri Dharshini", "Kavikeerthana Palmani", "Ramya shree", "PriyaDharshini",
+    "Keerthana L", "NAGARAJAN R","Kiruthika Saravanan", "Vimalkarthik"
+]
 
 # ────────────────────────────────────────────────
 def load_questions():
@@ -25,6 +31,7 @@ def load_questions():
     df = pd.read_excel(EXCEL_FILE, header=None)
     if df.shape[1] < 6:
         raise ValueError("Excel must have 6 columns: question + 4 options + answer letter")
+    
     questions = []
     for _, row in df.iterrows():
         try:
@@ -41,8 +48,10 @@ def load_questions():
             })
         except:
             continue
+    
     if not questions:
         raise ValueError("No valid questions found in Excel. Check format/content.")
+    
     print(f"Loaded {len(questions)} questions successfully.")
     return questions
 
@@ -70,13 +79,13 @@ LOGIN_HTML = """
 </head>
 <body>
 <div class="card">
-    <h1>iMatiz Technology</h1>
+    <h1>iMatiz Technology Quiz</h1>
     {% if kicked_msg %}<div class="msg">{{ kicked_msg | safe }}</div>{% endif %}
     
     <div id="blocked-msg" class="blocked">
         This test was terminated earlier (tab switch / timeout).<br>
-        You are no longer allowed to restart the test in this browser.<br>
-        Contact admin / HR if needed.
+        You are no longer allowed to restart in this browser.<br>
+        Contact Rajkumar if needed.
     </div>
 
     <form method="post" id="login-form">
@@ -108,7 +117,6 @@ LOGIN_HTML = """
     }
 
     nameSelect.addEventListener('change', () => checkLock(nameSelect.value));
-    // Check on load in case name is pre-filled (rare)
     if (nameSelect.value) checkLock(nameSelect.value);
 </script>
 </body>
@@ -131,27 +139,37 @@ QUESTION_HTML = """
         label {display:block;margin:1.3rem 0;padding:1rem;font-size:1.22rem;border-radius:8px;cursor:pointer;transition:0.18s;}
         label:hover {background:#f1f3f5;}
         input[type=radio] {transform:scale(1.5);margin-right:14px;}
-        button {display:block;margin:2.5rem auto 0;padding:0.9rem 3rem;font-size:1.25rem;background:#007bff;color:white;border:none;border-radius:8px;cursor:pointer;}
-        button:hover {background:#0069d9;}
+        .buttons {display:flex; justify-content:center; gap:30px; margin-top:2.5rem;}
+        button {padding:0.9rem 2.5rem;font-size:1.25rem;border:none;border-radius:8px;cursor:pointer;}
+        .next {background:#007bff;color:white;}
+        .next:hover {background:#0069d9;}
+        .skip {background:#6c757d;color:white;}
+        .skip:hover {background:#5a6268;}
     </style>
 </head>
 <body onload="startTimer();">
 <div class="container">
-    <div class="timer" id="timer">10 seconds</div>
+    <div class="timer" id="timer">30 seconds</div>
     <h2>Question {{ qnum }} of {{ total }}</h2>
     <div class="question">{{ question }}</div>
+    
     <form method="post" id="form">
         {% for opt in options %}
         <label>
-            <input type="radio" name="ans" value="{{ 'ABCD'[loop.index0] }}" required>
+            <input type="radio" name="ans" value="{{ 'ABCD'[loop.index0] }}">
             {{ opt }}
         </label>
         {% endfor %}
-        <button type="submit">Next →</button>
+        
+        <div class="buttons">
+            <button type="submit" name="action" value="next" class="next">Next →</button>
+            <button type="button" onclick="window.location.href='/test?skip=1'" class="skip">Skip</button>
+        </div>
     </form>
 </div>
+
 <script>
-let time = 10;
+let time = 30;
 let timer = setInterval(() => {
     time--;
     document.getElementById("timer").innerText = time + " seconds";
@@ -194,45 +212,47 @@ RESULT_HTML = """
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Test Results - iMatiz</title>
+    <title>Your Results - iMatiz</title>
     <style>
         body {font-family:Arial,sans-serif;background:#f8f9fa;margin:40px;}
-        .container {max-width:1100px;margin:auto;background:white;padding:30px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.15);}
-        h1 {text-align:center;color:#2c3e50;}
-        table {width:100%;border-collapse:collapse;margin-top:25px;}
+        .container {max-width:1000px;margin:auto;background:white;padding:30px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.15);}
+        h1, h2 {text-align:center;color:#2c3e50;}
+        .greeting {text-align:center; color:#2c3e50; margin-bottom:30px;}
+        table {width:100%;border-collapse:collapse;margin:25px 0;}
         th, td {padding:14px;text-align:left;border-bottom:1px solid #ddd;}
         th {background:#007bff;color:white;}
         tr:nth-child(even) {background:#f8f9fa;}
-        .score {font-weight:bold;color:#28a745;}
+        .score {font-weight:bold;color:#28a745;font-size:1.3em;}
         .terminated {color:#dc3545;font-weight:bold;}
-        .back {display:inline-block;margin-top:30px;padding:14px 40px;background:#007bff;color:white;text-decoration:none;border-radius:8px;}
+        .meta {color:#555; margin:10px 0; text-align:center;}
+        .back {display:inline-block;padding:14px 40px;background:#007bff;color:white;text-decoration:none;border-radius:8px;}
         .back:hover {background:#0069d9;}
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Test Results</h1>
+    <h1>Your Quiz Results</h1>
+    <div class="greeting">Hello <strong>{{ employee_name }}</strong></div>
+
     {% if results|length == 0 %}
-        <p style="text-align:center;color:#666;">No results recorded yet.</p>
+        <p style="text-align:center;color:#666;">No previous quiz attempts found.</p>
     {% else %}
     <table>
         <tr>
-            <th>Employee Name</th>
+            <th>Date & Time</th>
             <th>Score</th>
             <th>Answered</th>
-            <th>Unanswered</th>
+            <th>Skipped</th>
             <th>Total</th>
-            <th>Date & Time</th>
             <th>Status</th>
         </tr>
         {% for r in results %}
         <tr>
-            <td>{{ r['Employee Name'] }}</td>
-            <td class="score">{{ r['Correct Answers'] }}</td>
-            <td>{{ r['Answered Questions'] }}</td>
-            <td>{{ r['Unanswered Questions'] }}</td>
-            <td>{{ r['Total Questions'] }}</td>
             <td>{{ r['Date & Time'] }}</td>
+            <td class="score">{{ r['Correct Answers'] }} / {{ r['Total Questions'] }}</td>
+            <td>{{ r['Answered Questions'] }}</td>
+            <td>{{ r['Skipped Questions'] }}</td>
+            <td>{{ r['Total Questions'] }}</td>
             <td {% if 'Terminated' in r['Status'] %}class="terminated"{% endif %}>
                 {{ r['Status'] }}
             </td>
@@ -240,7 +260,10 @@ RESULT_HTML = """
         {% endfor %}
     </table>
     {% endif %}
-    <center><a href="/" class="back">Back to Login</a></center>
+
+    <center>
+        <a href="/" class="back">Back to Login</a>
+    </center>
 </div>
 </body>
 </html>
@@ -254,14 +277,13 @@ RESULT_HTML = """
 def login():
     kicked_msg = ""
     if request.args.get('terminated') == 'yes':
-        kicked_msg = "Previous session was terminated due to tab switch or timeout.<br>Contact Santhosh."
+        kicked_msg = "Previous session was terminated due to tab switch or timeout.<br>Contact Rajkumar ."
 
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         if name not in ALLOWED_EMPLOYEES:
             return "<h2 style='color:red;text-align:center'>Invalid employee name</h2>", 403
 
-        # Prevent re-login in same session (active test)
         if 'name' in session and session['name'] == name:
             return redirect('/test')
 
@@ -278,7 +300,7 @@ def login():
         session['name']     = name
         session['questions'] = questions
         session['current']   = 0
-        session['answers']   = {}
+        session['answers']   = {}           # None = skipped / timeout, str = answered
         return redirect('/test')
 
     return render_template_string(LOGIN_HTML,
@@ -294,10 +316,19 @@ def test():
     if session['current'] >= len(session['questions']):
         return redirect('/result')
 
+    # Handle skip via GET ?skip=1
+    if request.method == 'GET' and request.args.get('skip') == '1':
+        session['answers'][str(session['current'])] = None
+        session['current'] += 1
+        return redirect('/test')
+
     if request.method == 'POST':
-        ans = request.form.get('ans')
-        if ans:
-            session['answers'][str(session['current'])] = ans
+        action = request.form.get('action', 'next')
+
+        if action == 'next':
+            ans = request.form.get('ans')
+            session['answers'][str(session['current'])] = ans if ans else None
+
         session['current'] += 1
         return redirect('/test')
 
@@ -307,7 +338,7 @@ def test():
                                  total=len(session['questions']),
                                  question=q['question'],
                                  options=q['options'],
-                                 name=session.get('name', ''))   # ← required for lock
+                                 name=session.get('name', ''))
 
 
 @app.route('/result')
@@ -315,26 +346,38 @@ def result():
     if 'questions' not in session:
         return redirect('/')
 
-    # Save result
-    questions = session['questions']
-    answers   = session['answers']
-    answered_count = len(answers)
-    score = sum(1 for i in range(len(questions)) if str(i) in answers and answers[str(i)] == questions[i]['correct'])
+    # ────────────────────────────────────────────────
+    # IMPORTANT: Get & calculate everything BEFORE clearing session
+    # ────────────────────────────────────────────────
+    name = session.get('name', 'Unknown')
+    questions = session.get('questions', [])
+    answers   = session.get('answers', {})
+    total     = len(questions)
 
-    name  = session.get('name', 'Unknown')
-    total = len(questions)
-    unanswered = total - answered_count
+    correct   = 0
+    answered  = 0
+    skipped   = 0
+
+    for i in range(total):
+        user_ans = answers.get(str(i))
+        if user_ans is None:
+            skipped += 1
+        else:
+            answered += 1
+            if user_ans == questions[i]['correct']:
+                correct += 1
 
     row = {
         'Employee Name': name,
-        'Correct Answers': score,
-        'Answered Questions': answered_count,
-        'Unanswered Questions': unanswered,
+        'Correct Answers': correct,
+        'Answered Questions': answered,
+        'Skipped Questions': skipped,
         'Total Questions': total,
         'Date & Time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'Status': 'Completed'
     }
 
+    # Save result
     if os.path.exists(RESULT_FILE):
         df = pd.read_excel(RESULT_FILE)
         df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
@@ -342,18 +385,23 @@ def result():
         df = pd.DataFrame([row])
     df.to_excel(RESULT_FILE, index=False)
 
-    session.clear()
-
-    # Show all results
+    # Load & filter user's own results (still using name from session)
     if os.path.exists(RESULT_FILE):
         df = pd.read_excel(RESULT_FILE)
-        df['Date & Time'] = pd.to_datetime(df['Date & Time'])
-        df = df.sort_values('Date & Time', ascending=False)
-        results = df.to_dict('records')
+        df['Employee Name'] = df['Employee Name'].astype(str).str.strip()
+        user_results = df[df['Employee Name'] == name].copy()
+        user_results['Date & Time'] = pd.to_datetime(user_results['Date & Time'])
+        user_results = user_results.sort_values('Date & Time', ascending=False)
+        results = user_results.to_dict('records')
     else:
         results = []
 
-    return render_template_string(RESULT_HTML, results=results)
+    # Now it's safe to clear the session
+    session.clear()
+
+    return render_template_string(RESULT_HTML,
+                                 results=results,
+                                 employee_name=name)
 
 
 @app.route('/tab_cheat_end')
@@ -361,20 +409,29 @@ def tab_cheat_end():
     if 'questions' not in session:
         return redirect('/')
 
-    questions = session['questions']
-    answers   = session['answers']
-    answered_count = len(answers)
-    score = sum(1 for i in range(len(questions)) if str(i) in answers and answers[str(i)] == questions[i]['correct'])
+    name = session.get('name', 'Unknown')
+    questions = session.get('questions', [])
+    answers   = session.get('answers', {})
+    total     = len(questions)
 
-    name  = session.get('name', 'Unknown')
-    total = len(questions)
-    unanswered = total - answered_count
+    correct   = 0
+    answered  = 0
+    skipped   = 0
+
+    for i in range(total):
+        user_ans = answers.get(str(i))
+        if user_ans is None:
+            skipped += 1
+        else:
+            answered += 1
+            if user_ans == questions[i]['correct']:
+                correct += 1
 
     row = {
         'Employee Name': f"{name} (Terminated - Tab Switch)",
-        'Correct Answers': score,
-        'Answered Questions': answered_count,
-        'Unanswered Questions': unanswered,
+        'Correct Answers': correct,
+        'Answered Questions': answered,
+        'Skipped Questions': skipped,
         'Total Questions': total,
         'Date & Time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'Status': 'Terminated'
@@ -396,7 +453,9 @@ if __name__ == '__main__':
     print("   iMatiz Technology - Employee Quiz")
     print("   Allowed users:", ", ".join(ALLOWED_EMPLOYEES))
     print("   Note: Terminated users cannot restart in same browser")
+    print("   Results are private per employee")
+    print("   Score should now show correctly after finishing quiz")
     print("\nOpen →  http://127.0.0.1:5000")
-    print("Network → http://<your-ip>:5000   (ipconfig → IPv4 Address)")
+    print("Network → http://<your-ip>:5000")
     print()
     app.run(host='0.0.0.0', port=5000, debug=True)
