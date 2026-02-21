@@ -12,12 +12,38 @@ app.secret_key = 'super-secret-key-2025-change-this-to-something-very-random-and
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EXCEL_FILE  = os.path.join(BASE_DIR, "questions.xlsx")
 RESULT_FILE = os.path.join(BASE_DIR, "result.xlsx")
+
 ALLOWED_EMPLOYEES = [
-    "Santhosh","Rajkumar Sir ","Ram Sir ", "janani G Hegde2", "Amrutha N M", "AishwaryA G N", "Satish", "Zaiba Khanum",
-    "GuruDivya L", "Aarthi R", "Vashanth Kumar", "Abinaya 1", "Suchithra PS", "Dhanapriya R",
-    "Dhanya Shree U", "Nivetha S", "Shreyas CM", "Siri H G", "Ananaya GC", "Ashwini Sindhe", "Gopika ",
-    "Bhagya Shree U", "Sri Dharshini", "Kavikeerthana Palmani", "Ramya shree", "PriyaDharshini",
-    "Keerthana L", "NAGARAJAN R","Kiruthika Saravanan", "Vimalkarthik"
+    "Santhosh",
+    "Rajkumar Sir",
+    "Ram Sir",
+    "janani G Hegde2",
+    "Amrutha N M",
+    "AishwaryA G N",
+    "Satish",
+    "Zaiba Khanum",
+    "GuruDivya L",
+    "Aarthi R",
+    "Vashanth Kumar",
+    "Abinaya 1",
+    "Suchithra PS",
+    "Dhanapriya R",
+    "Dhanya Shree U",
+    "Nivetha S",
+    "Shreyas CM",
+    "Siri H G",
+    "Ananaya GC",
+    "Ashwini Sindhe",
+    "Gopika",
+    "Bhagya Shree U",
+    "SriDharshini PT",
+    "Kavikeerthana Palmani",
+    "Ramya shree",
+    "PriyaDharshini",
+    "Keerthana L",
+    "NAGARAJAN R",
+    "Kiruthika Saravanan",
+    "Vimalkarthik"
 ]
 
 # ────────────────────────────────────────────────
@@ -48,7 +74,7 @@ def load_questions():
     return questions
 
 # ────────────────────────────────────────────────
-# HTML TEMPLATES (your original versions)
+# HTML TEMPLATES
 # ────────────────────────────────────────────────
 
 LOGIN_HTML = """
@@ -71,7 +97,7 @@ LOGIN_HTML = """
 </head>
 <body>
 <div class="card">
-    <h1>iMatiz Technology Quiz</h1>
+    <h1>iMatiz Technology Assessment</h1>
     {% if kicked_msg %}<div class="msg">{{ kicked_msg | safe }}</div>{% endif %}
     
     <div id="blocked-msg" class="blocked">
@@ -223,11 +249,11 @@ RESULT_HTML = """
 </head>
 <body>
 <div class="container">
-    <h1>Your Quiz Results</h1>
+    <h1>Your Assessment Results</h1>
     <div class="greeting">Hello <strong>{{ employee_name }}</strong></div>
 
     {% if results|length == 0 %}
-        <p style="text-align:center;color:#666;">No previous quiz attempts found.</p>
+        <p style="text-align:center;color:#666;">No previous Assessment attempts found.</p>
     {% else %}
     <table>
         <tr>
@@ -273,7 +299,9 @@ def login():
 
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
-        if name not in ALLOWED_EMPLOYEES:
+        
+        # More forgiving comparison (ignores extra spaces)
+        if name not in [emp.strip() for emp in ALLOWED_EMPLOYEES]:
             return "<h2 style='color:red;text-align:center'>Invalid employee name</h2>", 403
 
         if 'name' in session and session['name'] == name:
@@ -307,7 +335,6 @@ def test():
 
     total = len(session['questions'])
 
-    # ────────────────────── QUIZ FINISHED ──────────────────────
     if session['current'] >= total:
         name = session.get('name', 'Unknown')
         questions = session.get('questions', [])
@@ -343,7 +370,7 @@ def test():
             else:
                 df = pd.DataFrame([row])
             df.to_excel(RESULT_FILE, index=False)
-            time.sleep(0.5)  # Give OS time to write file (Windows + OneDrive fix)
+            time.sleep(0.5)
         except Exception as e:
             print("Could not save result:", str(e))
 
@@ -361,7 +388,6 @@ def test():
         except Exception as e:
             print("Could not read results:", str(e))
 
-        # Fallback: always show current attempt if read failed
         if not results:
             results = [{
                 'Date & Time': now_str,
@@ -372,17 +398,13 @@ def test():
                 'Status': 'Completed'
             }]
 
-        # Render result BEFORE clearing session
         rendered = render_template_string(RESULT_HTML,
                                          results=results,
                                          employee_name=name)
-
-        # Clear session AFTER rendering
         session.clear()
-
         return rendered
 
-    # ────────────────────── NORMAL QUESTION FLOW ──────────────────────
+    # Normal flow
     if request.method == 'GET' and request.args.get('skip') == '1':
         session['answers'][str(session['current'])] = None
         session['current'] += 1
@@ -449,11 +471,10 @@ def tab_cheat_end():
 
 if __name__ == '__main__':
     print("\n" + "═"*70)
-    print(" iMatiz Technology Quiz - FIXED VERSION (2025)")
-    print(" Results shown directly after last question")
-    print(" Only own attempts are visible to each employee")
-    print(" Questions file:", EXCEL_FILE)
-    print(" Results file:", RESULT_FILE)
+    print(" iMatiz Technology Assessment")
+    print(" Allowed users (cleaned version):", ", ".join(ALLOWED_EMPLOYEES[:5]) + " ...")
+    print(" Questions:", EXCEL_FILE)
+    print(" Results:", RESULT_FILE)
     print(" Open → http://127.0.0.1:5000")
     print("═"*70)
     app.run(host='0.0.0.0', port=5000, debug=True)
