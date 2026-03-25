@@ -14,7 +14,7 @@ EXCEL_FILE  = os.path.join(BASE_DIR, "questions (1).xlsx")
 RESULT_FILE = os.path.join(BASE_DIR, "result.xlsx")
 
 ALLOWED_EMPLOYEES = [
-    "Santhosh",
+    "Santhosh 1",
     "Pavithra",
     "Ram",
     "janani G Hegde3",
