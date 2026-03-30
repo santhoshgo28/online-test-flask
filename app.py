@@ -26,7 +26,7 @@ ALLOWED_EMPLOYEES = [
     "Lora",
     "Shivani",
     "Manisha 1",
-    "Suchithra PS 1",
+    "Rahul",
     "Dhanapriya R 1",
     "Dhanya Shree U",
     "Nivetha S 1",
