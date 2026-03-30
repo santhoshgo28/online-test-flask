@@ -10,22 +10,22 @@ app.secret_key = 'super-secret-key-2025-change-this-to-something-very-random-and
 
 # ────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-EXCEL_FILE  = os.path.join(BASE_DIR, "questions (1).xlsx")
+EXCEL_FILE  = os.path.join(BASE_DIR, "questions.xlsx")
 RESULT_FILE = os.path.join(BASE_DIR, "result.xlsx")
 
 ALLOWED_EMPLOYEES = [
-    "K Suresh",
-    "Pavithra",
-    "Ram",
-    "janani G Hegde3",
-    "Amrutha N M 1",
-    "AishwaryA G N",
-    "Satish ",
-    "Zaiba Khanum 1",
-    "GuruDivya L 1",
-    "Aarthi R 1",
-    "Vashanth Kumar 1",
-    "Abinaya 1",
+    "Ashritha",
+    "Kavitha",
+    "Nithin",
+    "Sara",
+    "Shivakishor",
+    "Jayakirshna",
+    "Durgarao",
+    "Anusha",
+    "Sravani",
+    "Lora",
+    "Shivani",
+    "Manisha",
     "Suchithra PS 1",
     "Dhanapriya R 1",
     "Dhanya Shree U",
