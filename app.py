@@ -15,7 +15,7 @@ RESULT_FILE = os.path.join(BASE_DIR, "result.xlsx")
 
 ALLOWED_EMPLOYEES = [
     "Gayathri",
-    "Nikitha",
+    "Nikitha 1",
     "Nithin",
     "Sara",
     "Shivakishor",
